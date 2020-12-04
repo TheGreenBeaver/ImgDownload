@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ImgDownload</string>
+    <string name="download_image">Download Image</string>
+    <string name="img_description">Image from outer source</string>
+</resources>
