@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         loadBtn.setOnClickListener {
             val loadUrl = urlInput.text.toString()
             if (URLUtil.isValidUrl(loadUrl)) {
-                loadImgJob = lifecycle.coroutineScope.launch(Dispatchers.IO) {
+                loadImgJob = lifecycle.coroutineScope.launch(Dispatchers.Main) {
                     loadBtn.visibility = View.INVISIBLE
                     spinner.visibility = View.VISIBLE
                     bitmap = withContext(Dispatchers.IO) {
