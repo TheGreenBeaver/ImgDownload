@@ -1,8 +1,10 @@
 package com.example.imgdownload
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.os.AsyncTask
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -11,7 +13,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,8 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var loadBtn: Button
     private lateinit var spinner: ProgressBar
     private lateinit var urlInput: EditText
-
-    private lateinit var loadTask: ImgLoadTask
+    private lateinit var imageReceiver: ImageReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,51 +31,39 @@ class MainActivity : AppCompatActivity() {
         spinner = findViewById(R.id.progress_bar)
         urlInput = findViewById(R.id.url_input)
 
+        imageReceiver = ImageReceiver()
+        val filter = IntentFilter(Constants.LOADING_SUCCESS_ACTION.name)
+        registerReceiver(imageReceiver, filter)
+
         loadBtn.setOnClickListener {
+            loadBtn.visibility = View.INVISIBLE
+            urlInput.visibility = View.INVISIBLE
+            spinner.visibility = View.VISIBLE
             val loadUrl = urlInput.text.toString()
             if (URLUtil.isValidUrl(loadUrl)) {
-                loadTask = ImgLoadTask()
-                loadTask.execute(loadUrl)
-            }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        loadTask.cancel(true)
-    }
-
-    inner class ImgLoadTask: AsyncTask<String, Void, Bitmap>() {
-        override fun onPreExecute() {
-            super.onPreExecute()
-            loadBtn.visibility = View.INVISIBLE
-            spinner.visibility = View.VISIBLE
-            urlInput.visibility = View.INVISIBLE
-        }
-
-        override fun doInBackground(vararg params: String?): Bitmap? {
-            val url = params[0]!!
-            var resBitmap: Bitmap? = null
-            if (!isCancelled) {
-                try {
-                    val inpStream = java.net.URL(url).openStream()
-                    resBitmap = BitmapFactory.decodeStream(inpStream)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    return null
+                Intent(this, LoaderService::class.java).also { intent ->
+                    intent.putExtra(Constants.URL_TO_LOAD_KEY.name, loadUrl)
+                    startService(intent)
                 }
             }
-
-            return resBitmap
         }
+    }
 
-        override fun onPostExecute(result: Bitmap?) {
-            if (result != null) {
-                loadImg.setImageBitmap(result)
+    override fun onStop() {
+        stopService(Intent(this, LoaderService::class.java))
+        unregisterReceiver(imageReceiver)
+        super.onStop()
+    }
+
+    inner class ImageReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val pathToFile = intent?.getStringExtra(Constants.RES_BITMAP_KEY.name)
+            if (pathToFile != null) {
+                loadBtn.visibility = View.VISIBLE
+                urlInput.visibility = View.VISIBLE
+                spinner.visibility = View.GONE
+                loadImg.setImageURI(Uri.parse(pathToFile))
             }
-            loadBtn.visibility = View.VISIBLE
-            spinner.visibility = View.GONE
-            urlInput.visibility = View.VISIBLE
         }
     }
 }
