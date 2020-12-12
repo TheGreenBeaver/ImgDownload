@@ -46,12 +46,11 @@ class LoaderService : Service() {
                     }
 
 
-                    Intent().also { intent ->
-                        intent.putExtra(Constants.RES_BITMAP_KEY.name, Uri.fromFile(fileToSave).toString())
-                        intent.action = Constants.LOADING_SUCCESS_ACTION.name
-                        sendBroadcast(intent)
-                        stopSelf()
-                    }
+                    val resIntent = Intent(Constants.LOADING_SUCCESS_ACTION.name)
+                    resIntent.putExtra(Constants.RES_BITMAP_KEY.name, Uri.fromFile(fileToSave).toString())
+                    sendBroadcast(resIntent)
+                    stopSelf()
+
                 } catch (e: Exception) {
                     e.printStackTrace()
                     return@Thread
