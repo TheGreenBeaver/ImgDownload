@@ -10,26 +10,36 @@
         android:id="@+id/url_input"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:hint="@string/hint"
+        android:importantForAutofill="no"
+        android:inputType="textUri"
         app:layout_constraintBottom_toTopOf="@+id/load_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        android:inputType="textUri"
-        android:importantForAutofill="no" />
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <Button
         android:id="@+id/load_btn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="32dp"
         android:text="@string/download_image"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/path_output"
         app:layout_constraintEnd_toEndOf="@+id/url_input"
         app:layout_constraintStart_toStartOf="@+id/url_input"
         app:layout_constraintTop_toBottomOf="@+id/url_input" />
+
+    <TextView
+        android:id="@+id/path_output"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/result_file_path"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/load_btn"
+        app:layout_constraintStart_toStartOf="@+id/load_btn"
+        app:layout_constraintTop_toBottomOf="@+id/load_btn" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
